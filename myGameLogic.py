@@ -26,9 +26,10 @@ class Game:
         self.timer = 0
         self.timer_font = pygame.font.Font(None, self.font_size)
         self.enemies_avoided = 0
-        self.high_score = Score.load_high_score()[0]
-        self.high_enemies_avoided = Score.load_high_score()[1]
-        self.high_timer = Score.load_high_score()[2]
+        high_score, high_enemies_avoided, high_timer = Score.load_high_score()
+        self.high_score = high_score
+        self.high_enemies_avoided = high_enemies_avoided
+        self.high_timer = high_timer
 
         # Define colors
         self.BLACK = (0, 0, 0)
@@ -53,11 +54,11 @@ class Game:
         # Create quit button rectangle
         self.quit_rect = pygame.Rect(window.get_width() // 2 - 100, 400, 200, 50)
 
-         # Define the high score text content
+        # Define the high score text content
         self.high_score_text_content = [
             "-Top Run-",
             "High Score: " + str(self.high_score),
-            "Enemeis Avoided: " + str(self.high_enemies_avoided),
+            "Enemies Avoided: " + str(self.high_enemies_avoided),
             f"Timer: " + str((self.high_timer // 60))
         ]
 
@@ -127,20 +128,26 @@ class Game:
         # Update timer and score
         self.timer += 1
         self.score = self.timer // 10
-        # if enemy is not None else 0
-        if self.high_score < self.score: self.high_score = self.score
-        if self.high_enemies_avoided < self.enemies_avoided: self.high_enemies_avoided = self.enemies_avoided
-        if self.high_timer < self.timer: self.high_timer = self.timer
+        if self.high_score < self.score:
+            self.high_score = self.score
+        if self.high_enemies_avoided < self.enemies_avoided:
+            self.high_enemies_avoided = self.enemies_avoided
+        if self.high_timer < self.timer:
+            self.high_timer = self.timer
+
+        # Update high score text content
+        self.high_score_text_content[1] = "High Score: " + str(self.high_score)
+        self.high_score_text_content[2] = "Enemies Avoided: " + str(self.high_enemies_avoided)
+        self.high_score_text_content[3] = "Timer: " + str((self.high_timer // 60))
+
+        # Update high score text block
+        self.update_high_score_text_block()
+
 
 
     def check_collisions(self):
         if pygame.sprite.spritecollide(self.player, self.enemies, False):
             # Reset the game
-            if self.score > Score.load_high_score()[0] or self.enemies_avoided > Score.load_high_score()[1] or self.timer > Score.load_high_score()[2]:
-                Score.save_high_score(self.score, self.enemies_avoided, self.timer)
-                self.high_score = self.score
-                self.high_enemies_avoided = self.enemies_avoided
-                self.high_timer = self.timer
             self.end_game()
 
         # Check if any enemy has exited the left edge of the window and increment the enemies avoided variable
@@ -149,11 +156,21 @@ class Game:
                 self.enemies_avoided += 1
                 enemy.passed = True
 
+    def update_high_score_text_block(self):
+            self.high_score_text_block = []
+            for line in self.high_score_text_content:
+                rendered_line = self.high_score_font.render(line, True, self.YELLOW)
+                self.high_score_text_block.append(rendered_line)
+
+            self.high_score_text_block_width = max(line.get_width() for line in self.high_score_text_block)
+            self.high_score_text_block_height = len(self.high_score_text_block) * self.high_score_text_line_height
+
     def draw(self):
-        self.window.fill((0, 0, 0))
+        self.window.fill(self.BLACK)
 
         if not self.game_started:
             # Draw the text block onto the window
+            self.update_high_score_text_block()
             high_score_x = self.window.get_width() - self.high_score_text_block_width -10
             high_score_y = 10
             for line in self.high_score_text_block:
@@ -183,10 +200,25 @@ class Game:
             milliseconds = (self.timer % 60) * 1000 // 60
             timer_text = self.timer_font.render(f"Timer: {seconds}.{milliseconds:02d}", True, self.WHITE)
             self.window.blit(timer_text, (10, 90))
-            
-            hs_seconds = self.high_timer//60
-            hs_milliseconds = (self.high_timer % 60) * 1000 // 60
 
+            # Update high scores display block if necessary
+            if self.score > self.high_score:
+                self.high_score = self.score
+            if self.enemies_avoided > self.high_enemies_avoided:
+                self.high_enemies_avoided = self.enemies_avoided
+            if self.timer > self.high_timer:
+                self.high_timer = self.timer
+
+            # Get High Timer formatting
+            hs_seconds = self.high_timer // 60
+            hs_milliseconds = (self.high_timer % 60) * 1000 // 60
+            # Update high score text content
+            self.high_score_text_content[1] = "High Score: " + str(self.high_score)
+            self.high_score_text_content[2] = "Enemies Avoided: " + str(self.high_enemies_avoided)
+            self.high_score_text_content[3] = f"Timer: {hs_seconds}.{int(hs_milliseconds):02d}"
+
+            # Update high score text block
+            self.update_high_score_text_block()
 
             # Draw the text block onto the window
             high_score_x = self.window.get_width() - self.high_score_text_block_width -10
@@ -200,6 +232,15 @@ class Game:
         self.reset_game()
 
     def end_game(self):
+        #check for new high score
+        if self.score > self.high_score:
+            self.high_score = self.score
+        if self.enemies_avoided > self.high_enemies_avoided:
+            self.high_enemies_avoided = self.enemies_avoided
+        if self.timer > self.high_timer:
+            self.high_timer = self.timer
+        Score.save_high_score(self.high_score, self.high_enemies_avoided, self.high_timer)
+
         self.game_started = False
         self.reset_game()
 
