@@ -2,24 +2,29 @@ import pygame
 import myGameScore as Score
 from myGamePlayer import Player
 from myGameEnemy import Enemy
+from myGamePowerUp import PowerUp
 
 class Game:
     def __init__(self, window):
         # set up game variables
         self.font_size = 36
         self.font = pygame.font.Font(None, self.font_size)
+        self.score_font = pygame.font.Font(None, self.font_size)
+        self.high_score_font = pygame.font.Font(None, self.font_size)
+        self.power_up_font = pygame.font.Font(None, self.font_size)
+
         self.window = window
         self.window_width = 800
         self.window_height = 600
+
         self.clock = pygame.time.Clock()
-        self.score_font = pygame.font.Font(None, self.font_size)
-        self.high_score_font = pygame.font.Font(None, self.font_size)
         self.game_started = False
+
         self.gravity = 0.5
-        self.jump_power = -12
-        self.max_jump_count = 2
-        self.enemy_spawn_delay = 120
+        self.enemy_spawn_delay = 75
         self.enemy_spawn_timer = self.enemy_spawn_delay
+        self.powerup_spawn_delay=500
+        self.powerup_spawn_timer = self.powerup_spawn_delay
 
         # Score Variables
         self.score = 0
@@ -37,11 +42,13 @@ class Game:
         self.RED = (255, 0, 0)
         self.BLUE = (0, 0, 255)
         self.YELLOW = (255, 255, 0)
+        self.LGREEN = (50,205,50)
 
         # Create sprite groups
         self.all_sprites = pygame.sprite.Group()
         self.players = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
+        self.power_ups = pygame.sprite.Group()
 
         # Create player sprite
         self.player = Player(window.get_height(), window.get_width(), self.gravity, self.BLUE)
@@ -81,8 +88,8 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE and (not self.player.is_jumping or self.player.jump_count < self.max_jump_count) and self.game_started:
-                        self.player.speed_y = self.jump_power
+                    if event.key == pygame.K_SPACE and (not self.player.is_jumping or self.player.jump_count < self.player.max_jump_count) and self.game_started:
+                        self.player.speed_y = self.player.jump_power
                         self.player.is_jumping = True
                         self.player.jump_count += 1
                     elif event.key == pygame.K_a and self.game_started:
@@ -125,6 +132,15 @@ class Game:
             self.enemies.add(enemy)
             self.enemy_spawn_timer = self.enemy_spawn_delay
 
+        # Spawn power ups
+        self.powerup_spawn_timer -= 1
+        # power up = None  # Declare the variable with a default value
+        if self.powerup_spawn_timer <= 0:
+            powerUp = PowerUp(self.window.get_height(), self.window.get_width(), self.WHITE, self.player.getPlayerCordY())
+            self.all_sprites.add(powerUp)
+            self.power_ups.add(powerUp)
+            self.powerup_spawn_timer = self.powerup_spawn_delay
+        
         # Update timer and score
         self.timer += 1
         self.score = self.timer // 10
@@ -143,12 +159,12 @@ class Game:
         # Update high score text block
         self.update_high_score_text_block()
 
-
-
     def check_collisions(self):
         if pygame.sprite.spritecollide(self.player, self.enemies, False):
             # Reset the game
             self.end_game()
+        elif pygame.sprite.spritecollide(self.player, self.power_ups, True):
+                self.player.apply_power_up(15)  # Apply the power-up for 15 seconds
 
         # Check if any enemy has exited the left edge of the window and increment the enemies avoided variable
         for enemy in self.enemies.sprites():
@@ -209,7 +225,7 @@ class Game:
             if self.timer > self.high_timer:
                 self.high_timer = self.timer
 
-            # Get High Timer formatting
+            # Get High Score Timer formatting
             hs_seconds = self.high_timer // 60
             hs_milliseconds = (self.high_timer % 60) * 1000 // 60
             # Update high score text content
@@ -226,6 +242,18 @@ class Game:
             for line in self.high_score_text_block:
                 self.window.blit(line, (high_score_x, high_score_y))
                 high_score_y += self.high_score_text_line_height
+            
+            # If Player powerup active display text
+            if self.player.powerup_active:
+                powerup_text = self.power_up_font.render("Triple Jump Active", True, self.LGREEN)
+                powerup_text_rect = powerup_text.get_rect(center=((self.window_width // 2)+50, 16))
+                powerup_text_rect.x -= powerup_text_rect.width // 2
+                self.window.blit(powerup_text, powerup_text_rect)
+
+                powerup_timer_text = self.power_up_font.render(f"Time Left: {self.player.powerup_timer/100:.1f}s", True, self.LGREEN)
+                powerup_timer_text_rect = powerup_timer_text.get_rect(center=((self.window_width // 2)+50, 48))
+                powerup_timer_text_rect.x -= powerup_timer_text_rect.width // 2
+                self.window.blit(powerup_timer_text, powerup_timer_text_rect)
 
     def start_game(self):
         self.game_started = True
