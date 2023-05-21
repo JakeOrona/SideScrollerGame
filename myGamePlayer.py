@@ -18,6 +18,10 @@ class Player(pygame.sprite.Sprite):
         self.speed_y = 0
         self.is_jumping = False
         self.jump_count = 0
+        self.powerup_timer = 0
+        self.jump_power = -12
+        self.max_jump_count = 2
+        self.powerup_active = False
 
     def update(self):
         self.speed_y += self.gravity
@@ -33,6 +37,16 @@ class Player(pygame.sprite.Sprite):
             self.speed_y = 0
             self.is_jumping = False
             self.jump_count = 0
+        if self.powerup_timer > 0:
+                self.max_jump_count = 3  # add a 3rd jump
+                self.powerup_timer -= 1
+                if self.powerup_timer == 0:
+                    self.max_jump_count= 2  # Restore the original speed
+                    self.powerup_active = False
+
+    def apply_power_up(self, duration):
+        self.powerup_timer = duration * 60  # Convert duration to frames (assuming 60 FPS)
+        self.powerup_active = True
 
     def getPlayerCordY(self):
         return self.rect.y
