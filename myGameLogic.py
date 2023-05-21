@@ -1,8 +1,11 @@
 import pygame
 import myGameScore as Score
+import numpy as np
+import cv2
 from myGamePlayer import Player
 from myGameEnemy import Enemy
 from myGamePowerUp import PowerUp
+
 
 class Game:
     def __init__(self, window):
@@ -16,6 +19,10 @@ class Game:
         self.window = window
         self.window_width = 800
         self.window_height = 600
+
+        # Load the video clip
+        self.video_clip = cv2.VideoCapture("C:/Users/Jake/sideScrollerGame/resources/star-bg.mp4")
+        self.video_surface = None
 
         self.clock = pygame.time.Clock()
         self.game_started = False
@@ -115,6 +122,21 @@ class Game:
                 self.update()
                 self.check_collisions()
 
+            # Capture the video frame
+            ret, frame = self.video_clip.read()
+            if ret:
+                # Convert the frame to RGB
+                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                # Convert the resized frame to a Pygame surface
+                self.video_surface = pygame.surfarray.make_surface(frame_rgb)
+            else:
+                # Reset the video capture if it has reached the end
+                self.video_clip.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                ret, frame = self.video_clip.read()
+                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                self.video_surface = pygame.surfarray.make_surface(frame_rgb)
+
+            self.window.blit(self.video_surface, (0, 0))
             self.draw()
 
             pygame.display.flip()
@@ -182,7 +204,8 @@ class Game:
             self.high_score_text_block_height = len(self.high_score_text_block) * self.high_score_text_line_height
 
     def draw(self):
-        self.window.fill(self.BLACK)
+        # self.video_surface = pygame.surfarray.make_surface(self.video_clip.get_frame(pygame.time.get_ticks() / 1000 % self.video_clip.duration))
+        self.window.blit(self.video_surface, (0, 0))
 
         if not self.game_started:
             # Draw the text block onto the window
@@ -193,6 +216,7 @@ class Game:
                 self.window.blit(line, (high_score_x, high_score_y))
                 high_score_y += self.high_score_text_line_height
 
+            # Draw buttons
             pygame.draw.rect(self.window, (255, 0, 0), self.try_again_rect)
             try_again_text = pygame.font.Font(None, 40).render("Try Again", True, self.WHITE)
             try_again_text_rect = try_again_text.get_rect(center=self.try_again_rect.center)
