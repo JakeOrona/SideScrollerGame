@@ -1,55 +1,61 @@
 import pygame
+import json
 import myGameScore as Score
-import numpy as np
-import cv2
-from myGamePlayer import Player
-from myGameEnemy import Enemy
-from myGamePowerUp import PowerUp
+from sprites.playerSprite import Player
+from sprites.enemySprite import Enemy
+from sprites.powerUpSprite import PowerUp
+from PIL import Image
 
 
 class Game:
     def __init__(self, window):
+        # Load game data via json
+        with open("gameData\game_data") as file:
+            self.game_data = json.load(file)
+
         # set up game variables
-        self.font_size = 36
+        self.font_size = self.game_data["font_size"]
         self.font = pygame.font.Font(None, self.font_size)
         self.score_font = pygame.font.Font(None, self.font_size)
         self.high_score_font = pygame.font.Font(None, self.font_size)
         self.power_up_font = pygame.font.Font(None, self.font_size)
 
         self.window = window
-        self.window_width = 800
-        self.window_height = 600
+        self.window_width = self.game_data["window_width"]
+        self.window_height = self.game_data["window_hight"]
 
-        # Load the video clip
-        self.video_clip = cv2.VideoCapture("C:/Users/Jake/sideScrollerGame/resources/star-bg.mp4")
-        self.video_surface = None
+        # Load the background image and rescale to window size
+        self.background_image = pygame.image.load("resources\gameBackground.png")
+        self.background_image = self.background_image.convert()
+        self.background_image = pygame.transform.scale(self.background_image, (self.window_width, self.window_height)) 
+
 
         self.clock = pygame.time.Clock()
         self.game_started = False
-
-        self.gravity = 0.5
-        self.enemy_spawn_delay = 75
+        # set up more game variables
+        self.gravity = self.game_data["gravity"]
+        self.enemy_spawn_delay = self.game_data["enemy_spawn_delay"]
         self.enemy_spawn_timer = self.enemy_spawn_delay
-        self.powerup_spawn_delay=500
+        self.powerup_spawn_delay= self.game_data["powerup_spawn_delay"]
         self.powerup_spawn_timer = self.powerup_spawn_delay
 
-        # Score Variables
-        self.score = 0
-        self.timer = 0
+        # set up Score Variables
+        self.score = self.game_data["score"]
+        self.timer = self.game_data["timer"]
         self.timer_font = pygame.font.Font(None, self.font_size)
-        self.enemies_avoided = 0
+        self.enemies_avoided = self.game_data["enemies_avoided"]
         high_score, high_enemies_avoided, high_timer = Score.load_high_score()
         self.high_score = high_score
         self.high_enemies_avoided = high_enemies_avoided
         self.high_timer = high_timer
 
-        # Define colors
-        self.BLACK = (0, 0, 0)
-        self.WHITE = (255, 255, 255)
-        self.RED = (255, 0, 0)
-        self.BLUE = (0, 0, 255)
-        self.YELLOW = (255, 255, 0)
-        self.LGREEN = (50,205,50)
+        # Extract color codes
+        self.BLACK = tuple(self.game_data['BLACK'])
+        self.WHITE = tuple(self.game_data['WHITE'])
+        self.RED = tuple(self.game_data['RED'])
+        self.BLUE = tuple(self.game_data['BLUE'])
+        self.YELLOW = tuple(self.game_data['YELLOW'])
+        self.LGREEN = tuple(self.game_data['LGREEN'])
 
         # Create sprite groups
         self.all_sprites = pygame.sprite.Group()
@@ -122,21 +128,7 @@ class Game:
                 self.update()
                 self.check_collisions()
 
-            # Capture the video frame
-            ret, frame = self.video_clip.read()
-            if ret:
-                # Convert the frame to RGB
-                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                # Convert the resized frame to a Pygame surface
-                self.video_surface = pygame.surfarray.make_surface(frame_rgb)
-            else:
-                # Reset the video capture if it has reached the end
-                self.video_clip.set(cv2.CAP_PROP_POS_FRAMES, 0)
-                ret, frame = self.video_clip.read()
-                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                self.video_surface = pygame.surfarray.make_surface(frame_rgb)
-
-            self.window.blit(self.video_surface, (0, 0))
+            self.window.blit(self.background_image, (0, 0))
             self.draw()
 
             pygame.display.flip()
@@ -205,7 +197,7 @@ class Game:
 
     def draw(self):
         # self.video_surface = pygame.surfarray.make_surface(self.video_clip.get_frame(pygame.time.get_ticks() / 1000 % self.video_clip.duration))
-        self.window.blit(self.video_surface, (0, 0))
+        self.window.blit(self.background_image, (0, 0))
 
         if not self.game_started:
             # Draw the text block onto the window

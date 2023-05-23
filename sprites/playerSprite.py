@@ -1,4 +1,5 @@
 import pygame
+import json
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, windowH, windowW, gravity, color):
@@ -6,21 +7,26 @@ class Player(pygame.sprite.Sprite):
         self.window_height = windowH
         self.window_width = windowW
         self.gravity = gravity
-        self.color= color
-        self.width = 40
-        self.height = 60
+        self.color = color
+
+        # load player data from file
+        with open('gameData\player_data.json') as data_file:
+            data = json.load(data_file)
+        
+        self.width = data["width"]
+        self.height = data["height"]
         self.image = pygame.Surface((self.width, self.height))
         self.image.fill(self.color)
         self.rect = self.image.get_rect()
-        self.rect.x = 50
+        self.rect.x = data["initial_x"]
         self.rect.y = self.window_height - self.height
-        self.speed_x = 0
-        self.speed_y = 0
+        self.speed_x = data["player_speed_x"]
+        self.speed_y = data["player_speed_y"]
         self.is_jumping = False
-        self.jump_count = 0
-        self.powerup_timer = 0
-        self.jump_power = -12
-        self.max_jump_count = 2
+        self.jump_count = data["initial_jump_count"]
+        self.powerup_timer = data["initial_powerup_timer"]
+        self.jump_power = data["jump_power"]
+        self.max_jump_count = data["max_jump_count"]
         self.powerup_active = False
 
     def update(self):

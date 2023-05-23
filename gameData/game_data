@@ -1,0 +1,17 @@
+{
+    "font_size": 32,
+    "window_width": 800,
+    "window_hight": 600,
+    "gravity": 0.5,
+    "enemy_spawn_delay": 75,
+    "powerup_spawn_delay": 700,
+    "score": 0,
+    "timer": 0,
+    "enemies_avoided": 0,
+    "BLACK": [0, 0, 0],
+    "WHITE": [255, 255, 255],
+    "RED": [255, 0, 0],
+    "BLUE": [0, 0, 255],
+    "YELLOW": [255, 255, 0],
+    "LGREEN": [50, 205, 50]
+}
