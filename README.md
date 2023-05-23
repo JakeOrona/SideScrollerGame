@@ -8,6 +8,6 @@ Sprite icons are from: https://www.icons8.com
 
 'spacebar' jumps.
 
-Collect white circle for triple jump powerup.
+Collect boots for triple jump powerup. Dodge the bullets!
 
 Hint: you can double jump!
