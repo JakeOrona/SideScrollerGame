@@ -297,7 +297,10 @@ class Game:
         self.player = Player(self.window.get_height(), self.window.get_width(), self.gravity)
         self.all_sprites.add(self.player)
         self.players.add(self.player)
-        # set up Score Variables
+        # reset Score Variables
         self.score = self.game_data["score"]
         self.timer = self.game_data["timer"]
         self.enemies_avoided = self.game_data["enemies_avoided"]
+        # reset sprite spawn delay
+        self.enemy_spawn_delay = self.game_data["enemy_spawn_delay"]
+        self.powerup_spawn_delay = self.game_data["powerup_spawn_delay"]
