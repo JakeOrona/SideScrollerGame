@@ -1,0 +1,12 @@
+{
+  "width": 40,
+  "height": 60,
+  "initial_x": 50,
+  "initial_y": 0,
+  "player_speed_x": 0,
+  "player_speed_y": 0,
+  "initial_jump_count": 0,
+  "initial_powerup_timer": 0,
+  "jump_power": -12,
+  "max_jump_count": 2
+}

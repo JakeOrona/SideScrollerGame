@@ -1,0 +1,9 @@
+{
+  "width": 35,
+  "height": 35,
+  "initial_x": 800,
+  "min_y": 180,
+  "max_y": 540,
+  "min_speed_x": 3,
+  "max_speed_x": 6
+}
