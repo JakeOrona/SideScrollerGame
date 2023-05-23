@@ -21,7 +21,7 @@ class Enemy(pygame.sprite.Sprite):
         # self.image.fill(self.color)
         self.rect = self.image.get_rect()
         self.rect.x = data["initial_x"]
-        self.rect.y = random.randint(data["min_y"], (self.window_height + self.height))
+        self.rect.y = random.randint(data["min_y"], (self.window_height - self.height))
         self.speed_x = random.randint(data["min_speed_x"], data["max_speed_x"])
         self.passed = False
 
