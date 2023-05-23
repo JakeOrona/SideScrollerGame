@@ -1,5 +1,6 @@
 import pygame
 import json
+import random
 import myGameScore as Score
 from sprites.playerSprite import Player
 from sprites.enemySprite import Enemy
@@ -25,13 +26,13 @@ class Game:
         self.window_height = self.game_data["window_hight"]
 
         # Load the background image and rescale to window size
-        self.background_image = pygame.image.load("resources\gameBackground.png")
+        self.background_image = pygame.image.load("resources/vw_mt_bg.png")
         self.background_image = self.background_image.convert()
         self.background_image = pygame.transform.scale(self.background_image, (self.window_width, self.window_height)) 
 
-
         self.clock = pygame.time.Clock()
         self.game_started = False
+
         # set up more game variables
         self.gravity = self.game_data["gravity"]
         self.enemy_spawn_delay = self.game_data["enemy_spawn_delay"]
@@ -64,7 +65,7 @@ class Game:
         self.power_ups = pygame.sprite.Group()
 
         # Create player sprite
-        self.player = Player(window.get_height(), window.get_width(), self.gravity, self.BLUE)
+        self.player = Player(window.get_height(), window.get_width(), self.gravity)
         self.all_sprites.add(self.player)
         self.players.add(self.player)
 
@@ -139,18 +140,19 @@ class Game:
 
         # Spawn enemies
         self.enemy_spawn_timer -= 1
-        # enemy = None  # Declare the variable with a default value
+        num_enemies = random.randint(self.game_data["min_enemies"], self.game_data["max_enemies"])
         if self.enemy_spawn_timer <= 0:
-            enemy = Enemy(self.window.get_height(), self.window.get_width(), self.RED, self.player.getPlayerCordY())
-            self.all_sprites.add(enemy)
-            self.enemies.add(enemy)
+            for _ in range(num_enemies):
+                enemy = Enemy(self.window.get_height(), self.window.get_width())
+                self.all_sprites.add(enemy)
+                self.enemies.add(enemy)
             self.enemy_spawn_timer = self.enemy_spawn_delay
 
         # Spawn power ups
         self.powerup_spawn_timer -= 1
         # power up = None  # Declare the variable with a default value
         if self.powerup_spawn_timer <= 0:
-            powerUp = PowerUp(self.window.get_height(), self.window.get_width(), self.WHITE, self.player.getPlayerCordY())
+            powerUp = PowerUp(self.window.get_height(), self.window.get_width())
             self.all_sprites.add(powerUp)
             self.power_ups.add(powerUp)
             self.powerup_spawn_timer = self.powerup_spawn_delay
@@ -196,7 +198,6 @@ class Game:
             self.high_score_text_block_height = len(self.high_score_text_block) * self.high_score_text_line_height
 
     def draw(self):
-        # self.video_surface = pygame.surfarray.make_surface(self.video_clip.get_frame(pygame.time.get_ticks() / 1000 % self.video_clip.duration))
         self.window.blit(self.background_image, (0, 0))
 
         if not self.game_started:
@@ -221,6 +222,7 @@ class Game:
 
         else:
             self.all_sprites.draw(self.window)
+            self.window.blit(self.player.image, self.player.rect)  # Draw the player image
 
             score_text = self.score_font.render(f"Score: {self.score}", True, self.WHITE)
             self.window.blit(score_text, (10, 10))
@@ -292,9 +294,10 @@ class Game:
         self.all_sprites.empty()
         self.players.empty()
         self.enemies.empty()
-        self.player = Player(self.window.get_height(), self.window.get_width(), self.gravity, self.BLUE)
+        self.player = Player(self.window.get_height(), self.window.get_width(), self.gravity)
         self.all_sprites.add(self.player)
         self.players.add(self.player)
-        self.score = 0
-        self.timer = 0
-        self.enemies_avoided = 0
+        # set up Score Variables
+        self.score = self.game_data["score"]
+        self.timer = self.game_data["timer"]
+        self.enemies_avoided = self.game_data["enemies_avoided"]
