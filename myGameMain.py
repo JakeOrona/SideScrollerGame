@@ -1,5 +1,5 @@
 import pygame
-from myGameLogic import Game
+from gameLogic.myGameLogic import Game
 
 # Initialize Pygame
 pygame.init()

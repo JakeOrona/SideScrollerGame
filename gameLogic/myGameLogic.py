@@ -1,7 +1,7 @@
 import pygame
 import json
 import random
-import myGameScore as Score
+import gameLogic.myGameScore as Score
 from sprites.playerSprite import Player
 from sprites.enemySprite import Enemy
 from sprites.powerUpSprite import PowerUp
@@ -11,7 +11,7 @@ from PIL import Image
 class Game:
     def __init__(self, window):
         # Load game data via json
-        with open("gameData\game_data") as file:
+        with open("gameData\game_data.json") as file:
             self.game_data = json.load(file)
 
         # set up game variables
