@@ -3,5 +3,6 @@
   "min_y": 180,
   "max_y": 540,
   "min_speed_x": 4,
-  "max_speed_x": 10
+  "max_speed_x": 10,
+  "animation_interval": 6
 }

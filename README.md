@@ -8,6 +8,7 @@ Sprite icons are from: https://www.icons8.com
 
 'spacebar' jumps; players can double jump.
 
-Collect white circle for triple jump powerup. Dodge the bullets!
+Collect petrol can for triple jump powerup. Dodge the bullets!
 
-Hint: you can double jump!
+# Update 5.23 build 2
+Animated powerup sprite to flash
