@@ -1,9 +1,10 @@
 import pygame
 import json
 import random
-import gameLogic.myGameScore as Score
+import gameLogic.saveScore as Score
 from sprites.playerSprite import Player
-from sprites.enemySprite import Enemy
+from sprites.enemySmallSprite import EnemySmall
+from sprites.enemyBigSprite import EnemyBig
 from sprites.powerUpSprite import PowerUp
 from PIL import Image
 
@@ -30,13 +31,16 @@ class Game:
         self.background_image = self.background_image.convert()
         self.background_image = pygame.transform.scale(self.background_image, (self.window_width, self.window_height)) 
 
+        # Set more game variables
         self.clock = pygame.time.Clock()
         self.game_started = False
-
-        # set up more game variables
         self.gravity = self.game_data["gravity"]
-        self.enemy_spawn_delay = self.game_data["enemy_spawn_delay"]
-        self.enemy_spawn_timer = self.enemy_spawn_delay
+
+        # set up sprite spawn delays
+        self.enemy_small_spawn_delay = self.game_data["enemy_small_spawn_delay"]
+        self.enemy_small_spawn_timer = self.enemy_small_spawn_delay
+        self.enemy_big_spawn_delay = self.game_data["enemy_big_spawn_delay"]
+        self.enemy_big_spawn_timer = self.enemy_big_spawn_delay
         self.powerup_spawn_delay= self.game_data["powerup_spawn_delay"]
         self.powerup_spawn_timer = self.powerup_spawn_delay
 
@@ -101,6 +105,7 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                # Need to move keybinding to a new file    
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE and (not self.player.is_jumping or self.player.jump_count < self.player.max_jump_count) and self.game_started:
                         self.player.speed_y = self.player.jump_power
@@ -138,15 +143,24 @@ class Game:
     def update(self):
         self.all_sprites.update()
 
-        # Spawn enemies
-        self.enemy_spawn_timer -= 1
-        num_enemies = random.randint(self.game_data["min_enemies"], self.game_data["max_enemies"])
-        if self.enemy_spawn_timer <= 0:
-            for _ in range(num_enemies):
-                enemy = Enemy(self.window.get_height(), self.window.get_width())
-                self.all_sprites.add(enemy)
-                self.enemies.add(enemy)
-            self.enemy_spawn_timer = self.enemy_spawn_delay
+        # Spawn small enemies
+        self.enemy_small_spawn_timer -= 1
+        num_small_enemies = random.randint(self.game_data["min_small_enemies"], self.game_data["max_small_enemies"])
+        if self.enemy_small_spawn_timer <= 0:
+            for _ in range(num_small_enemies):
+                enemySmall = EnemySmall(self.window.get_height(), self.window.get_width())
+                self.all_sprites.add(enemySmall)
+                self.enemies.add(enemySmall)
+            self.enemy_small_spawn_timer = self.enemy_small_spawn_delay
+        # Spawn big enemies
+        self.enemy_big_spawn_timer -= 1
+        num_big_enemies = random.randint(self.game_data["min_big_enemies"], self.game_data["max_big_enemies"])
+        if self.enemy_big_spawn_timer <= 0:
+            for _ in range(num_big_enemies):
+                enemyBig = EnemyBig(self.window.get_height(), self.window.get_width())
+                self.all_sprites.add(enemyBig)
+                self.enemies.add(enemyBig)
+            self.enemy_big_spawn_timer = self.enemy_big_spawn_delay
 
         # Spawn power ups
         self.powerup_spawn_timer -= 1
@@ -302,5 +316,6 @@ class Game:
         self.timer = self.game_data["timer"]
         self.enemies_avoided = self.game_data["enemies_avoided"]
         # reset sprite spawn delay
-        self.enemy_spawn_delay = self.game_data["enemy_spawn_delay"]
+        self.enemy_small_spawn_delay = self.game_data["enemy_small_spawn_delay"]
+        self.enemy_big_spawn_delay = self.game_data["enemy_big_spawn_delay"]
         self.powerup_spawn_delay = self.game_data["powerup_spawn_delay"]

@@ -15,12 +15,7 @@ class Player(pygame.sprite.Sprite):
             data = json.load(data_file)
         
         self.width = self.image.get_width()
-        print(self.width)
-        
         self.height = self.image.get_height()
-        print(self.height)
-        # self.image = pygame.Surface((self.width, self.height))
-        # self.image.fill(self.color)
         self.rect = self.image.get_rect()
         self.rect.x = data["initial_x"]
         self.rect.y = self.window_height - self.height
