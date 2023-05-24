@@ -24,6 +24,6 @@ def save_high_score(score, enemies_avoided, timer):
         high_enemies_avoided = enemies_avoided
     if timer > high_timer:
         high_timer = timer
-    high_score_data = {"score": high_score, "enemies_avoided": high_enemies_avoided, "timer": high_timer}
+    high_score_data = {"score": high_score, "enemies_avoided": high_enemies_avoided, "timer": int(high_timer)}
     with open("C:\\Users\\Jake\\sideScrollerGame\\gameData\\myGameHighScore.json", "w") as file:
         json.dump(high_score_data, file)
