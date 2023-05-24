@@ -17,7 +17,7 @@ class PowerUp(pygame.sprite.Sprite):
         self.image = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
 
         # Load the powerup image and resize it to fit within the circular shape
-        powerup_image = pygame.image.load("resources/boot.png")
+        powerup_image = pygame.image.load("resources/petrol.png")
         powerup_image = pygame.transform.scale(powerup_image, (self.radius * 2, self.radius * 2))
 
         # Blit the powerup image onto the circular surface

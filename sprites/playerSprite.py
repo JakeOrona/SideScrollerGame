@@ -4,7 +4,7 @@ import json
 class Player(pygame.sprite.Sprite):
     def __init__(self, windowH, windowW, gravity):
         super().__init__()
-        self.image = pygame.image.load("resources\gun.png").convert_alpha() # load player image
+        self.image = pygame.image.load("resources/tank-80-55.png").convert_alpha() # load player image
         self.rect = self.image.get_rect()  # Get the rectangle of the player image
         self.window_height = windowH
         self.window_width = windowW
@@ -16,8 +16,6 @@ class Player(pygame.sprite.Sprite):
         
         self.width = self.image.get_width()
         self.height = self.image.get_height()
-        # self.image = pygame.Surface((self.width, self.height))
-        # self.image.fill(self.color)
         self.rect = self.image.get_rect()
         self.rect.x = data["initial_x"]
         self.rect.y = self.window_height - self.height
