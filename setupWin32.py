@@ -12,8 +12,8 @@ cx_Freeze.setup(
     version="0.1",
     options={
         "build_exe": {
-            "packages": ["pygame", "myGameLogic", "myGameScore"],
-            'include_files': ["sprites", "resources", "gameData",],}
+            "packages": ["pygame", "json", "random"],
+            'include_files': [("gameLogic/saveScore.py", "gameLogic/saveScore.py"), "sprites", "resources", "gameData", "gameLogic"],}
             },
     executables = [cx_Freeze.Executable("myGameMain.py", base=base)]
 )
